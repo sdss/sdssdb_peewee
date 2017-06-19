@@ -1,0 +1,83 @@
+---
+
+apo_user : sdssdb
+apo_admin: sdssdb_admin
+
+apo@sdss4-db: &apo_default
+    user: sdssdb
+    host: sdss4-db
+    port: 5432
+    database: apodb
+
+apo_admin@sdss4-db:
+    user: sdssdb_admin
+    host: sdss4-db
+    port: 5432
+    database: apodb
+
+apo@localhost: &apo_localhost
+    user: sdssdb
+    host: localhost
+    port: 5432
+    database: apodb
+
+apo_admin@localhost:
+    user: sdssdb_admin
+    host: localhost
+    port: 5432
+    database: apodb
+
+apo@tunnel:
+    user: sdssdb
+    host: localhost
+    port: 5432
+    database: apodb
+
+apo_admin@tunnel:
+    user: sdssdb_admin
+    host: localhost
+    port: 6000
+    database: apodb
+
+apo: *apo_default
+
+
+lco@sdss4-db: &lco_default
+    user: sdssdb
+    host: sdss4-db
+    port: 5432
+    database: lcodb
+
+lco_admin@sdss4-db:
+    user: sdssdb_admin
+    host: sdss4-db
+    port: 5432
+    database: lcodb
+
+lco@localhost:
+    user: sdssdb
+    host: localhost
+    port: 5432
+    database: lcodb
+
+lco_admin@localhost:
+    user: sdssdb_admin
+    host: localhost
+    port: 5432
+    database: lcodb
+
+lco@tunnel:
+    user: sdssdb
+    host: localhost
+    port: 5432
+    database: lcodb
+
+lco_admin@tunnel:
+    user: sdssdb_admin
+    host: localhost
+    port: 6000
+    database: lcodb
+
+lco: *lco_default
+
+local: *apo_localhost
