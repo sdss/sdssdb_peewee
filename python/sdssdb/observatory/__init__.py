@@ -3,7 +3,10 @@ import re
 
 from peewee import Model
 
-from ..database.database import observatory_database as database
+from ..database.database import ObservatoryDatabase
+
+
+database = ObservatoryDatabase()
 
 
 class BaseModel(Model):
