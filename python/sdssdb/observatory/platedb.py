@@ -20,7 +20,10 @@ from peewee import CompositeKey, CharField, PrimaryKeyField
 
 from playhouse.fields import ManyToManyField, DeferredThroughModel
 
-from sdssdb.observatory import BaseModel
+from sdssdb.observatory import BaseModel, database
+
+
+database = database  # To avoid annoying PEP8 warning
 
 
 class UnknownField(object):
@@ -90,10 +93,10 @@ class TileStatus(BaseModel):
 class Tile(BaseModel):
     id = IntegerField(null=True, unique=True)
     pk = PrimaryKeyField()
-    tile_status_pk = ForeignKeyField(db_column='tile_status_pk',
-                                     rel_model=TileStatus,
-                                     related_name='tiles',
-                                     to_field='pk')
+    tile_status = ForeignKeyField(db_column='tile_status_pk',
+                                  rel_model=TileStatus,
+                                  related_name='tiles',
+                                  to_field='pk')
 
     class Meta:
         db_table = 'tile'
@@ -139,10 +142,10 @@ class Plate(BaseModel):
 
     chunk = TextField(null=True)
     comment = TextField(null=True)
-    current_survey_mode_pk = ForeignKeyField(db_column='current_survey_mode_pk',
-                                             null=True,
-                                             rel_model=SurveyMode,
-                                             to_field='pk')
+    current_survey_mode = ForeignKeyField(db_column='current_survey_mode_pk',
+                                          null=True,
+                                          rel_model=SurveyMode,
+                                          to_field='pk')
     design = ForeignKeyField(db_column='design_pk',
                              null=True,
                              rel_model=Design,
@@ -159,13 +162,13 @@ class Plate(BaseModel):
         related_name='plates',
         to_field='pk')
     plate_id = IntegerField(db_column='plate_id', unique=True)
-    plate_location_pk = ForeignKeyField(db_column='plate_location_pk',
-                                        rel_model=PlateLocation,
-                                        to_field='pk')
-    plate_run_pk = ForeignKeyField(db_column='plate_run_pk',
-                                   null=True,
-                                   rel_model=PlateRun,
-                                   to_field='pk')
+    plate_location = ForeignKeyField(db_column='plate_location_pk',
+                                     rel_model=PlateLocation,
+                                     to_field='pk')
+    plate_run = ForeignKeyField(db_column='plate_run_pk',
+                                null=True,
+                                rel_model=PlateRun,
+                                to_field='pk')
     rerun = TextField(null=True)
     temperature = DecimalField(null=True)
     tile_id = IntegerField(db_column='tile_id', null=True)
@@ -209,21 +212,22 @@ PluggingInstrumentDeferred = DeferredThroughModel()
 
 
 class Plugging(BaseModel):
-    cartridge_pk = ForeignKeyField(db_column='cartridge_pk',
-                                   null=True,
-                                   rel_model=Cartridge,
-                                   related_name='pluggings',
-                                   to_field='pk')
+    cartridge = ForeignKeyField(db_column='cartridge_pk',
+                                null=True,
+                                rel_model=Cartridge,
+                                related_name='pluggings',
+                                to_field='pk')
     fscan = IntegerField(db_column='fscan_id', null=True)
     fscan_mjd = IntegerField(null=True)
     name = TextField(null=True)
     pk = PrimaryKeyField()
-    plate_pk = ForeignKeyField(db_column='plate_pk',
-                               rel_model=Plate,
-                               related_name='pluggings',
-                               to_field='pk')
-    plugging_status_pk = ForeignKeyField(db_column='plugging_status_pk',
-                                         rel_model=PluggingStatus, to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk',
+                            rel_model=Plate,
+                            related_name='pluggings',
+                            to_field='pk')
+    status = ForeignKeyField(db_column='plugging_status_pk',
+                             rel_model=PluggingStatus, to_field='pk',
+                             related_name='pluggings')
 
     instruments = ManyToManyField(rel_model=Instrument,
                                   through_model=PluggingInstrumentDeferred,
@@ -236,9 +240,9 @@ class Plugging(BaseModel):
 
 class ActivePlugging(BaseModel):
     pk = PrimaryKeyField()
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
-                                  related_name='active_plugging',
-                                  to_field='pk', unique=True)
+    plugging = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
+                               related_name='active_plugging',
+                               to_field='pk', unique=True)
 
     class Meta:
         db_table = 'active_plugging'
@@ -256,8 +260,8 @@ class ApogeeThreshold(BaseModel):
 class BossPluggingInfo(BaseModel):
     first_dr = TextField(null=True)
     pk = PrimaryKeyField()
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
-                                  related_name='boss_plugging_info', to_field='pk')
+    plugging = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
+                               related_name='boss_plugging_info', to_field='pk')
 
     class Meta:
         db_table = 'boss_plugging_info'
@@ -265,9 +269,9 @@ class BossPluggingInfo(BaseModel):
 
 
 class Camera(BaseModel):
-    instrument_pk = ForeignKeyField(db_column='instrument_pk', null=True,
-                                    rel_model=Instrument,
-                                    related_name='cameras', to_field='pk')
+    instrument = ForeignKeyField(db_column='instrument_pk', null=True,
+                                 rel_model=Instrument,
+                                 related_name='cameras', to_field='pk')
     label = TextField(null=True)
     pk = PrimaryKeyField()
 
@@ -277,8 +281,8 @@ class Camera(BaseModel):
 
 
 class BossSn2Threshold(BaseModel):
-    camera_pk = ForeignKeyField(db_column='camera_pk', rel_model=Camera,
-                                related_name='boss_sn2_thresholds', to_field='pk')
+    camera = ForeignKeyField(db_column='camera_pk', rel_model=Camera,
+                             related_name='boss_sn2_thresholds', to_field='pk')
     min_exposures = IntegerField(null=True)
     pk = PrimaryKeyField()
     sn2_min = DecimalField(null=True)
@@ -311,8 +315,8 @@ class ExposureStatus(BaseModel):
 class Pointing(BaseModel):
     center_dec = DecimalField(null=True)
     center_ra = DecimalField(null=True)
-    design_pk = ForeignKeyField(db_column='design_pk', rel_model=Design,
-                                related_name='pointings', to_field='pk')
+    design = ForeignKeyField(db_column='design_pk', rel_model=Design,
+                             related_name='pointings', to_field='pk')
     pk = BigIntegerField(primary_key=True)
     pointing_no = IntegerField(null=True)
 
@@ -326,11 +330,12 @@ class PlatePointing(BaseModel):
     ha_observable_min = DecimalField(null=True)
     hour_angle = DecimalField(null=True)
     pk = PrimaryKeyField()
-    plate_pk = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
-                               related_name='plate_pointings', to_field='pk')
-    pointing_name = UnknownField()  # "char"
-    pointing_pk = ForeignKeyField(db_column='pointing_pk', null=True,
-                                  rel_model=Pointing, to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
+                            related_name='plate_pointings', to_field='pk')
+    pointing_name = CharField(null=False)
+    pointing = ForeignKeyField(db_column='pointing_pk', null=True,
+                               rel_model=Pointing, to_field='pk',
+                               related_name='plate_pointings')
     priority = IntegerField()
 
     class Meta:
@@ -353,16 +358,16 @@ class ObservationStatus(BaseModel):
 class Observation(BaseModel):
     comment = TextField(null=True)
     mjd = DecimalField(null=True)
-    observation_status_pk = ForeignKeyField(db_column='observation_status_pk',
-                                            rel_model=ObservationStatus,
-                                            related_name='observations',
-                                            to_field='pk')
+    observation_status = ForeignKeyField(db_column='observation_status_pk',
+                                         rel_model=ObservationStatus,
+                                         related_name='observations',
+                                         to_field='pk')
     pk = PrimaryKeyField()
-    plate_pointing_pk = ForeignKeyField(db_column='plate_pointing_pk', null=True,
-                                        rel_model=PlatePointing,
-                                        related_name='observtions', to_field='pk')
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', null=True,
-                                  rel_model=Plugging, related_name='observations', to_field='pk')
+    plate_pointing = ForeignKeyField(db_column='plate_pointing_pk', null=True,
+                                     rel_model=PlatePointing,
+                                     related_name='observtions', to_field='pk')
+    plugging = ForeignKeyField(db_column='plugging_pk', null=True,
+                               rel_model=Plugging, related_name='observations', to_field='pk')
 
     class Meta:
         db_table = 'observation'
@@ -370,23 +375,26 @@ class Observation(BaseModel):
 
 
 class Exposure(BaseModel):
-    camera_pk = ForeignKeyField(db_column='camera_pk', null=True,
-                                rel_model=Camera, related_name='exposures', to_field='pk')
+    camera = ForeignKeyField(db_column='camera_pk', null=True,
+                             rel_model=Camera, related_name='exposures', to_field='pk')
     comment = TextField(null=True)
-    exposure_flavor_pk = ForeignKeyField(
-        db_column='exposure_flavor_pk', null=True, rel_model=ExposureFlavor, to_field='pk')
+    exposure_flavor = ForeignKeyField(db_column='exposure_flavor_pk',
+                                      null=True,
+                                      rel_model=ExposureFlavor,
+                                      to_field='pk')
     exposure_no = IntegerField(null=True)
-    exposure_status_pk = ForeignKeyField(
-        db_column='exposure_status_pk', rel_model=ExposureStatus, to_field='pk')
+    exposure_status = ForeignKeyField(db_column='exposure_status_pk',
+                                      rel_model=ExposureStatus,
+                                      to_field='pk')
     exposure_time = DecimalField(null=True)
-    observation_pk = ForeignKeyField(db_column='observation_pk', null=True, rel_model=Observation,
-                                     related_name='exposures', to_field='pk')
+    observation = ForeignKeyField(db_column='observation_pk', null=True, rel_model=Observation,
+                                  related_name='exposures', to_field='pk')
     pk = PrimaryKeyField()
     start_time = DecimalField(null=True)
-    survey_mode_pk = ForeignKeyField(db_column='survey_mode_pk',
-                                     null=True, rel_model=SurveyMode, to_field='pk')
-    survey_pk = ForeignKeyField(db_column='survey_pk', null=True,
-                                rel_model=Survey, related_name='exposures', to_field='pk')
+    survey_mode = ForeignKeyField(db_column='survey_mode_pk',
+                                  null=True, rel_model=SurveyMode, to_field='pk')
+    survey = ForeignKeyField(db_column='survey_pk', null=True,
+                             rel_model=Survey, related_name='exposures', to_field='pk')
 
     class Meta:
         db_table = 'exposure'
@@ -397,11 +405,11 @@ class Exposure(BaseModel):
 
 
 class CameraFrame(BaseModel):
-    camera_pk = ForeignKeyField(db_column='camera_pk', rel_model=Camera,
-                                related_name='camera_frames', to_field='pk')
+    camera = ForeignKeyField(db_column='camera_pk', rel_model=Camera,
+                             related_name='camera_frames', to_field='pk')
     comment = TextField(null=True)
-    exposure_pk = ForeignKeyField(db_column='exposure_pk', rel_model=Exposure,
-                                  related_name='camera_frames', to_field='pk')
+    exposure = ForeignKeyField(db_column='exposure_pk', rel_model=Exposure,
+                               related_name='camera_frames', to_field='pk')
     pk = PrimaryKeyField()
     sn2 = DecimalField(null=True)
 
@@ -435,8 +443,8 @@ class CmmMeas(BaseModel):
     fitrot = DecimalField(null=True)
     fitscale = DecimalField(null=True)
     pk = PrimaryKeyField()
-    plate_pk = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
-                               related_name='cmm_measurements', to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
+                            related_name='cmm_measurements', to_field='pk')
 
     class Meta:
         db_table = 'cmm_meas'
@@ -462,10 +470,10 @@ class DesignField(BaseModel):
 
 
 class DesignValue(BaseModel):
-    design_field_pk = ForeignKeyField(db_column='design_field_pk',
-                                      null=True, rel_model=DesignField, to_field='pk')
-    design_pk = ForeignKeyField(db_column='design_pk', null=True,
-                                rel_model=Design, related_name='design_values', to_field='pk')
+    field = ForeignKeyField(db_column='design_field_pk',
+                            null=True, rel_model=DesignField, to_field='pk')
+    design = ForeignKeyField(db_column='design_pk', null=True,
+                             rel_model=Design, related_name='values', to_field='pk')
     pk = BigIntegerField(primary_key=True)
     value = TextField(null=True)
 
@@ -475,6 +483,12 @@ class DesignValue(BaseModel):
             (('design_pk', 'design_field_pk'), True),
         )
         schema = 'platedb'
+
+    def __repr__(self):
+        return '<DesignValue: pk={0}, design={1}, field={2}, value={3}>'.format(self.pk,
+                                                                                self.design_pk,
+                                                                                self.field.label,
+                                                                                self.value)
 
 
 class ExposureHeaderKeyword(BaseModel):
@@ -488,10 +502,11 @@ class ExposureHeaderKeyword(BaseModel):
 
 class ExposureHeaderValue(BaseModel):
     comment = TextField(null=True)
-    exposure_header_keyword_pk = ForeignKeyField(
-        db_column='exposure_header_keyword_pk', rel_model=ExposureHeaderKeyword, to_field='pk')
-    exposure_pk = ForeignKeyField(db_column='exposure_pk', rel_model=Exposure,
-                                  related_name='exposure_header_values', to_field='pk')
+    exposure_header_keyword = ForeignKeyField(db_column='exposure_header_keyword_pk',
+                                              rel_model=ExposureHeaderKeyword,
+                                              to_field='pk')
+    exposure = ForeignKeyField(db_column='exposure_pk', rel_model=Exposure,
+                               related_name='exposure_header_values', to_field='pk')
     index = IntegerField()
     pk = PrimaryKeyField()
     value = TextField()
@@ -510,8 +525,8 @@ class PlPlugmapM(BaseModel):
     fscan_mjd = IntegerField(null=True)
     md5_checksum = TextField(null=True)
     pk = PrimaryKeyField()
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', null=True,
-                                  rel_model=Plugging, related_name='plplugmapms', to_field='pk')
+    plugging = ForeignKeyField(db_column='plugging_pk', null=True,
+                               rel_model=Plugging, related_name='plplugmapms', to_field='pk')
     pointing_name = CharField(null=True)
 
     class Meta:
@@ -540,8 +555,8 @@ class PlateHoleType(BaseModel):
 class PlateHolesFile(BaseModel):
     filename = TextField()
     pk = PrimaryKeyField()
-    plate_pk = ForeignKeyField(db_column='plate_pk', rel_model=Plate,
-                               related_name='plate_hole_files', to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', rel_model=Plate,
+                            related_name='plate_hole_files', to_field='pk')
 
     class Meta:
         db_table = 'plate_holes_file'
@@ -552,13 +567,18 @@ class PlateHole(BaseModel):
     apogee_target1 = IntegerField(null=True)
     apogee_target2 = IntegerField(null=True)
     catalog_object_pk = IntegerField(index=True, null=True)
-    object_type_pk = ForeignKeyField(db_column='object_type_pk',
-                                     null=True, rel_model=ObjectType, to_field='pk')
+    object_type = ForeignKeyField(db_column='object_type_pk',
+                                  null=True, rel_model=ObjectType, to_field='pk')
     pk = PrimaryKeyField()
-    plate_hole_type_pk = ForeignKeyField(
-        db_column='plate_hole_type_pk', null=True, rel_model=PlateHoleType, to_field='pk')
-    plate_holes_file_pk = ForeignKeyField(
-        db_column='plate_holes_file_pk', null=True, rel_model=PlateHolesFile, to_field='pk')
+    plate_hole_type = ForeignKeyField(db_column='plate_hole_type_pk',
+                                      null=True,
+                                      rel_model=PlateHoleType,
+                                      to_field='pk')
+    plate_holes_file = ForeignKeyField(db_column='plate_holes_file_pk',
+                                       null=True,
+                                       rel_model=PlateHolesFile,
+                                       to_field='pk',
+                                       related_name='plate_holes')
     pointing_number = IntegerField(null=True)
     tmass_h = DecimalField(null=True)
     tmass_j = DecimalField(null=True)
@@ -574,10 +594,10 @@ class PlateHole(BaseModel):
 class Fiber(BaseModel):
     fiber = IntegerField(db_column='fiber_id')
     pk = PrimaryKeyField()
-    pl_plugmap_m_pk = ForeignKeyField(db_column='pl_plugmap_m_pk',
-                                      rel_model=PlPlugmapM, to_field='pk')
-    plate_hole_pk = ForeignKeyField(db_column='plate_hole_pk', rel_model=PlateHole,
-                                    related_name='fibers', to_field='pk')
+    pl_plugmap_m = ForeignKeyField(db_column='pl_plugmap_m_pk',
+                                   rel_model=PlPlugmapM, to_field='pk')
+    plate_hole = ForeignKeyField(db_column='plate_hole_pk', rel_model=PlateHole,
+                                 related_name='fibers', to_field='pk')
 
     class Meta:
         db_table = 'fiber'
@@ -585,8 +605,8 @@ class Fiber(BaseModel):
 
 
 class Gprobe(BaseModel):
-    cartridge_pk = ForeignKeyField(db_column='cartridge_pk', null=True, rel_model=Cartridge,
-                                   related_name='gprobes', to_field='pk')
+    cartridge = ForeignKeyField(db_column='cartridge_pk', null=True, rel_model=Cartridge,
+                                related_name='gprobes', to_field='pk')
     exists = IntegerField(null=True)
     fiber_type = UnknownField()  # USER-DEFINED
     focus_offset = DecimalField(null=True)
@@ -605,8 +625,8 @@ class Gprobe(BaseModel):
 
 
 class HoleMeas(BaseModel):
-    cmm_meas_pk = ForeignKeyField(db_column='cmm_meas_pk', null=True,
-                                  rel_model=CmmMeas, to_field='pk')
+    cmm_meas = ForeignKeyField(db_column='cmm_meas_pk', null=True,
+                               rel_model=CmmMeas, to_field='pk')
     diaerr = DecimalField(null=True)
     measx = DecimalField(null=True)
     measy = DecimalField(null=True)
@@ -614,8 +634,8 @@ class HoleMeas(BaseModel):
     nomx = DecimalField(null=True)
     nomy = DecimalField(null=True)
     pk = PrimaryKeyField()
-    plate_hole_pk = ForeignKeyField(db_column='plate_hole_pk', null=True, rel_model=PlateHole,
-                                    related_name='hole_measurements', to_field='pk')
+    plate_hole = ForeignKeyField(db_column='plate_hole_pk', null=True, rel_model=PlateHole,
+                                 related_name='hole_measurements', to_field='pk')
     qpresidr = DecimalField(null=True)
     qpresidx = DecimalField(null=True)
     qpresidy = DecimalField(null=True)
@@ -633,12 +653,12 @@ class PlateCompletionStatusHistory(BaseModel):
     first_name = TextField(null=True)
     last_name = TextField(null=True)
     pk = PrimaryKeyField()
-    plate_completion_status_pk = ForeignKeyField(db_column='plate_completion_status_pk',
-                                                 rel_model=PlateCompletionStatus,
-                                                 related_name='plate_completion_status_history',
-                                                 to_field='pk')
-    plate_pk = ForeignKeyField(db_column='plate_pk', rel_model=Plate,
-                               related_name='plate_completion_status_history', to_field='pk')
+    plate_completion_status = ForeignKeyField(db_column='plate_completion_status_pk',
+                                              rel_model=PlateCompletionStatus,
+                                              related_name='plate_completion_status_history',
+                                              to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', rel_model=Plate,
+                            related_name='plate_completion_status_history', to_field='pk')
     timestamp = DateTimeField()
 
     class Meta:
@@ -648,8 +668,8 @@ class PlateCompletionStatusHistory(BaseModel):
 
 class PlateInput(BaseModel):
     comment = TextField(null=True)
-    design_pk = ForeignKeyField(db_column='design_pk', null=True,
-                                rel_model=Design, related_name='plate_inputs', to_field='pk')
+    design = ForeignKeyField(db_column='design_pk', null=True,
+                             rel_model=Design, related_name='inputs', to_field='pk')
     filepath = TextField(null=True)
     input_number = IntegerField(null=True)
     md5_checksum = TextField(null=True)
@@ -709,11 +729,11 @@ class PlateRunToDesign(BaseModel):
 
 class PlateToPlateStatus(BaseModel):
     pk = BigIntegerField(primary_key=True)
-    plate_pk = ForeignKeyField(db_column='plate_pk', null=True,
-                               rel_model=Plate,
-                               to_field='pk')
-    plate_status_pk = ForeignKeyField(db_column='plate_status_pk', null=True,
-                                      rel_model=PlateStatus, to_field='pk')
+    platek = ForeignKeyField(db_column='plate_pk', null=True,
+                             rel_model=Plate,
+                             to_field='pk')
+    plate_status = ForeignKeyField(db_column='plate_status_pk', null=True,
+                                   rel_model=PlateStatus, to_field='pk')
 
     class Meta:
         db_table = 'plate_to_plate_status'
@@ -725,10 +745,10 @@ class PlateToPlateStatus(BaseModel):
 
 class PlateToSurvey(BaseModel):
     pk = PrimaryKeyField()
-    plate_pk = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
-                               to_field='pk')
-    survey_pk = ForeignKeyField(db_column='survey_pk', null=True,
-                                rel_model=Survey, to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', null=True, rel_model=Plate,
+                            to_field='pk')
+    survey = ForeignKeyField(db_column='survey_pk', null=True,
+                             rel_model=Survey, to_field='pk')
 
     class Meta:
         db_table = 'plate_to_survey'
@@ -752,11 +772,11 @@ class PluggingToBossSn2Threshold(BaseModel):
 
 
 class PluggingToInstrument(BaseModel):
-    instrument_pk = ForeignKeyField(db_column='instrument_pk', null=True, rel_model=Instrument,
-                                    to_field='pk')
+    instrument = ForeignKeyField(db_column='instrument_pk', null=True, rel_model=Instrument,
+                                 to_field='pk')
     pk = PrimaryKeyField()
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', null=True,
-                                  rel_model=Plugging, to_field='pk')
+    plugging = ForeignKeyField(db_column='plugging_pk', null=True,
+                               rel_model=Plugging, to_field='pk')
 
     class Meta:
         db_table = 'plugging_to_instrument'
@@ -787,8 +807,8 @@ class ProfTolerances(BaseModel):
     r4_low = DecimalField()
     r5_high = DecimalField()
     r5_low = DecimalField()
-    survey_pk = ForeignKeyField(db_column='survey_pk', rel_model=Survey,
-                                related_name='prof_tolerances', to_field='pk')
+    survey = ForeignKeyField(db_column='survey_pk', rel_model=Survey,
+                             related_name='prof_tolerances', to_field='pk')
     version = IntegerField()
 
     class Meta:
@@ -799,10 +819,10 @@ class ProfTolerances(BaseModel):
 class Profilometry(BaseModel):
     comment = TextField(null=True)
     pk = PrimaryKeyField()
-    plugging_pk = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
-                                  related_name='profilometries', to_field='pk')
-    prof_tolerances_pk = ForeignKeyField(db_column='prof_tolerances_pk', rel_model=ProfTolerances,
-                                         related_name='profilometries', to_field='pk')
+    plugging = ForeignKeyField(db_column='plugging_pk', rel_model=Plugging,
+                               related_name='profilometries', to_field='pk')
+    prof_tolerances = ForeignKeyField(db_column='prof_tolerances_pk', rel_model=ProfTolerances,
+                                      related_name='profilometries', to_field='pk')
     timestamp = DateTimeField()
 
     class Meta:
@@ -813,8 +833,8 @@ class Profilometry(BaseModel):
 class ProfMeasurement(BaseModel):
     number = IntegerField()
     pk = PrimaryKeyField()
-    profilometry_pk = ForeignKeyField(db_column='profilometry_pk',
-                                      rel_model=Profilometry, to_field='pk')
+    profilometry = ForeignKeyField(db_column='profilometry_pk',
+                                   rel_model=Profilometry, to_field='pk')
     r1 = DecimalField(null=True)
     r2 = DecimalField(null=True)
     r3 = DecimalField(null=True)
@@ -841,10 +861,10 @@ class TileStatusHistory(BaseModel):
     first_name = TextField(null=True)
     last_name = TextField(null=True)
     pk = PrimaryKeyField()
-    tile_pk = ForeignKeyField(db_column='tile_pk', rel_model=Tile,
-                              related_name='tile_status_history', to_field='pk')
-    tile_status_pk = ForeignKeyField(db_column='tile_status_pk', rel_model=TileStatus,
-                                     related_name='tile_status_history', to_field='pk')
+    tile = ForeignKeyField(db_column='tile_pk', rel_model=Tile,
+                           related_name='tile_status_history', to_field='pk')
+    tile_status = ForeignKeyField(db_column='tile_status_pk', rel_model=TileStatus,
+                                  related_name='tile_status_history', to_field='pk')
     timestamp = DateTimeField()
 
     class Meta:
