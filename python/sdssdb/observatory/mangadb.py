@@ -17,10 +17,13 @@ from __future__ import absolute_import
 from peewee import PrimaryKeyField, TextField, IntegerField, BooleanField
 from peewee import ForeignKeyField, FloatField
 
-from sdssdb.observatory import BaseModel
+from sdssdb.observatory import BaseModel, database
 
 from .platedb import Plate as PlatedbPlate
 from .platedb import Exposure as PlatedbExposure
+
+
+database = database  # To avoid annoying PEP8 warning
 
 
 class UnknownField(object):
