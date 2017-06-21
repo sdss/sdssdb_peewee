@@ -17,7 +17,7 @@ from peewee import PostgresqlDatabase, OperationalError
 from sdssdb import config
 
 
-__all__ = ('SDSSDatabase', 'ObservtoryDatabase', 'observatory_database')
+__all__ = ('SDSSDatabase', 'ObservatoryDatabase')
 
 
 class SDSSDatabase(PostgresqlDatabase):
@@ -25,17 +25,49 @@ class SDSSDatabase(PostgresqlDatabase):
     def __init__(self):
 
         super(SDSSDatabase, self).__init__(None)
+        self.connected = False
 
-    def from_config(self, config_key):
+    def _test_connection(self):
+        """Checks whether the connection is correct."""
+
+        try:
+            self.connect()
+            self.connected = True
+        except OperationalError:
+            self.init(None)
+            self.connected = False
+
+    def connect_from_config(self, config_key):
         """Initialises the database from the config file."""
 
         db_configuration = config[config_key]
 
         dbname = db_configuration.pop('database')
         self.init(dbname, **db_configuration)
+        self._test_connection()
+
+    def connect_from_parameters(self, **params):
+        """Initialises the database from a dictionary of parameters."""
+
+        dbname = params.pop('database')
+        self.init(dbname, **params)
+        self._test_connection()
+
+    def check_connection(self):
+        """Checks whether the connection is open or can be connected."""
+
+        if self.connected and self.get_conn().closed == 0:
+            return True
+
+        try:
+            self.connect()
+            self.connected = True
+            return True
+        except OperationalError:
+            return False
 
 
-class ObservtoryDatabase(SDSSDatabase):
+class ObservatoryDatabase(SDSSDatabase):
 
     APO = 'apo'
     LCO = 'lco'
@@ -43,10 +75,9 @@ class ObservtoryDatabase(SDSSDatabase):
 
     def __init__(self, autoconnect=True, admin=False):
 
-        super(ObservtoryDatabase, self).__init__()
+        super(ObservatoryDatabase, self).__init__()
 
         self.location = None
-        self.connected = False
 
         self.set_location()
 
@@ -81,18 +112,12 @@ class ObservtoryDatabase(SDSSDatabase):
     def autoconnect(self):
         """Tries to select the best possible connection to the db."""
 
-        try:
-            if self.location == self.APO:
-                self.from_config('apo')
-            elif self.location == self.LCO:
-                self.from_config('lco')
-            else:
-                self.from_config('local')
-            self.connect()
-            self.connected = True
-        except OperationalError:
-            self.init(None)
-            self.connected = False
+        if self.location == self.APO:
+            self.connect_from_config('apo')
+        elif self.location == self.LCO:
+            self.connect_from_config('lco')
+        else:
+            self.connect_from_config('local')
 
     def _become(self, user):
         """Internal method to change the connection to a certain user."""
@@ -123,6 +148,3 @@ class ObservtoryDatabase(SDSSDatabase):
         """Becomes the non-admin user."""
 
         self._become(config['apo_user'])
-
-
-observatory_database = ObservtoryDatabase()
