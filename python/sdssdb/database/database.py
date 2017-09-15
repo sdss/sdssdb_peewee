@@ -11,6 +11,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import socket
+import warnings
 
 from peewee import PostgresqlDatabase, OperationalError
 
@@ -34,13 +35,17 @@ class SDSSDatabase(PostgresqlDatabase):
             self.connect()
             self.connected = True
         except OperationalError:
+
+            warnings.warn('failed to connect to database {0}. '
+                          'Setting database to None.'.format(self.database),
+                          UserWarning)
             self.init(None)
             self.connected = False
 
     def connect_from_config(self, config_key):
         """Initialises the database from the config file."""
 
-        db_configuration = config[config_key]
+        db_configuration = config[config_key].copy()
 
         dbname = db_configuration.pop('database')
         self.init(dbname, **db_configuration)
