@@ -41,7 +41,7 @@ def get_config():
     user_path = pathlib.Path.home() / '.sdssdb'
     user = user_path.exists() and yaml.load(open(str(user_path), 'r'))
 
-    default_path = pathlib.Path(__file__).parents[0] / '../etc/sdssdb.yaml'
+    default_path = pathlib.Path(__file__).parents[3] / 'etc/sdssdb.yaml'
     default = yaml.load(open(str(default_path), 'r'))
 
     return merge(user, default)
