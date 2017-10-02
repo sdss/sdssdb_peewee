@@ -21,6 +21,33 @@ from sdssdb import config
 __all__ = ('SDSSDatabase', 'ObservatoryDatabase')
 
 
+class Dotable(dict):
+    """A custom dict class that allows dot access to nested dictionaries.
+
+    Copied from http://hayd.github.io/2013/dotable-dictionaries/. Note that
+    this allows you to use dots to get dictionary values, but not to set them.
+
+    """
+
+    def __getattr__(self, value):
+        if '__' in value:
+            return dict.__getattr__(self, value)
+        else:
+            return self.__getitem__(value)
+
+    # def __init__(self, d):
+    #     dict.__init__(self, ((k, self.parse(v)) for k, v in d.iteritems()))
+
+    @classmethod
+    def parse(cls, v):
+        if isinstance(v, dict):
+            return cls(v)
+        elif isinstance(v, list):
+            return [cls.parse(i) for i in v]
+        else:
+            return v
+
+
 class SDSSDatabase(PostgresqlDatabase):
 
     def __init__(self):
@@ -86,6 +113,8 @@ class ObservatoryDatabase(SDSSDatabase):
             self.set_location()
         else:
             self.location = location
+
+        self.models = Dotable({})
 
         if autoconnect:
             self.autoconnect()

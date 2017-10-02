@@ -42,3 +42,8 @@ class BaseModel(Model):
             return '<{0}: {1}>'.format(reg.group(1), ', '.join(fields))
 
         return super(BaseModel, self).__repr__()
+
+
+from . import mangadb, platedb
+
+database.models.update({'mangadb': mangadb, 'platedb': platedb})
