@@ -78,13 +78,14 @@ class ObservatoryDatabase(SDSSDatabase):
     LCO = 'lco'
     LOCAL = 'local'
 
-    def __init__(self, autoconnect=True, admin=False):
+    def __init__(self, location=None, autoconnect=True, admin=False):
 
         super(ObservatoryDatabase, self).__init__()
 
-        self.location = None
-
-        self.set_location()
+        if location is None:
+            self.set_location()
+        else:
+            self.location = location
 
         if autoconnect:
             self.autoconnect()
@@ -121,8 +122,10 @@ class ObservatoryDatabase(SDSSDatabase):
             self.connect_from_config('apo')
         elif self.location == self.LCO:
             self.connect_from_config('lco')
-        else:
+        elif self.location == self.LOCAL:
             self.connect_from_config('local')
+        else:
+            raise ValueError('invalid location {!r}'.format(self.location))
 
     def _become(self, user):
         """Internal method to change the connection to a certain user."""
