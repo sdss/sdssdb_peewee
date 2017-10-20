@@ -45,7 +45,10 @@ class Dotable(dict):
         elif isinstance(v, list):
             return [cls.parse(i) for i in v]
         else:
-            return v
+            return
+
+    def __dir__(self):
+        return list(self.keys())
 
 
 class SDSSDatabase(PostgresqlDatabase):
