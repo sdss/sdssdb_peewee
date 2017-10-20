@@ -52,6 +52,16 @@ class Design(BaseModel):
         db_table = 'design'
         schema = 'platedb'
 
+    def get_value_for_field(self, field):
+        """Returns the value of a design field."""
+
+        design_field = DesignField.select().where(DesignField.label == field.lower()).first()
+        if design_field is None:
+            raise ValueError('invalid field name')
+
+        return DesignValue.select().where((DesignValue.design == self) &
+                                          (DesignValue.field == design_field)).first()
+
 
 class PlateCompletionStatus(BaseModel):
     label = TextField(null=True)
@@ -479,9 +489,7 @@ class DesignValue(BaseModel):
 
     class Meta:
         db_table = 'design_value'
-        indexes = (
-            (('design_pk', 'design_field_pk'), True),
-        )
+        indexes = ((('design_pk', 'design_field_pk'), True),)
         schema = 'platedb'
 
     def __repr__(self):
