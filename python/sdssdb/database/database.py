@@ -101,6 +101,12 @@ class SDSSDatabase(PostgresqlDatabase):
         except OperationalError:
             return False
 
+    @staticmethod
+    def list_profiles():
+        """Returns a list of profiles."""
+
+        return config.keys()
+
 
 class ObservatoryDatabase(SDSSDatabase):
 
