@@ -737,9 +737,9 @@ class PlateRunToDesign(BaseModel):
 
 class PlateToPlateStatus(BaseModel):
     pk = BigIntegerField(primary_key=True)
-    platek = ForeignKeyField(db_column='plate_pk', null=True,
-                             rel_model=Plate,
-                             to_field='pk')
+    plate = ForeignKeyField(db_column='plate_pk', null=True,
+                            rel_model=Plate,
+                            to_field='pk')
     plate_status = ForeignKeyField(db_column='plate_status_pk', null=True,
                                    rel_model=PlateStatus, to_field='pk')
 
