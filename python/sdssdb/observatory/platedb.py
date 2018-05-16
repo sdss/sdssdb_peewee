@@ -16,9 +16,9 @@ from __future__ import absolute_import
 
 from peewee import TextField, DecimalField, IntegerField, BooleanField
 from peewee import BigIntegerField, ForeignKeyField, DateTimeField, DateField
-from peewee import CompositeKey, CharField, PrimaryKeyField
+from peewee import CompositeKey, CharField, PrimaryKeyField, ManyToManyField
 
-from playhouse.fields import ManyToManyField, DeferredThroughModel
+from playhouse.fields import DeferredThroughModel
 
 from sdssdb.observatory import BaseModel, database
 
