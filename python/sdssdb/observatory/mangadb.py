@@ -52,10 +52,10 @@ class Plate(BaseModel):
     manga_tileid = IntegerField(null=True)
     neverobserve = BooleanField()
     pk = PrimaryKeyField()
-    platedb_plate = ForeignKeyField(db_column='platedb_plate_pk',
+    platedb_plate = ForeignKeyField(column_name='platedb_plate_pk',
                                     null=True,
-                                    rel_model=PlatedbPlate,
-                                    to_field='pk')
+                                    model=PlatedbPlate,
+                                    field='pk')
     special_plate = BooleanField(null=True)
 
     class Meta:
@@ -67,10 +67,10 @@ class DataCube(BaseModel):
     b1_sn2 = FloatField(null=True)
     b2_sn2 = FloatField(null=True)
     pk = PrimaryKeyField()
-    platedb_plate = ForeignKeyField(db_column='plate_pk',
+    platedb_plate = ForeignKeyField(column_name='plate_pk',
                                     null=True,
-                                    rel_model=PlatedbPlate,
-                                    to_field='pk')
+                                    model=PlatedbPlate,
+                                    field='pk')
     r1_sn2 = FloatField(null=True)
     r2_sn2 = FloatField(null=True)
 
@@ -101,10 +101,10 @@ class Set(BaseModel):
     comment = TextField(null=True)
     name = TextField(null=True)
     pk = PrimaryKeyField()
-    status = ForeignKeyField(db_column='set_status_pk',
-                             null=True, rel_model=SetStatus,
-                             to_field='pk',
-                             related_name='sets')
+    status = ForeignKeyField(column_name='set_status_pk',
+                             null=True, model=SetStatus,
+                             field='pk',
+                             backref='sets')
 
     class Meta:
         db_table = 'set'
@@ -113,32 +113,32 @@ class Set(BaseModel):
 
 class Exposure(BaseModel):
     comment = TextField(null=True)
-    data_cube = ForeignKeyField(db_column='data_cube_pk',
+    data_cube = ForeignKeyField(column_name='data_cube_pk',
                                 null=True,
-                                rel_model=DataCube,
-                                related_name='exposures',
-                                to_field='pk')
+                                model=DataCube,
+                                backref='exposures',
+                                field='pk')
     dither_dec = FloatField(null=True)
     dither_position = UnknownField(null=True)  # ARRAY
     dither_ra = FloatField(null=True)
-    status = ForeignKeyField(db_column='exposure_status_pk',
+    status = ForeignKeyField(column_name='exposure_status_pk',
                              null=True,
-                             rel_model=ExposureStatus,
-                             to_field='pk',
-                             related_name='exposures')
+                             model=ExposureStatus,
+                             field='pk',
+                             backref='exposures')
     ha = FloatField(null=True)
     pk = PrimaryKeyField()
-    platedb_exposure = ForeignKeyField(db_column='platedb_exposure_pk',
+    platedb_exposure = ForeignKeyField(column_name='platedb_exposure_pk',
                                        null=True,
-                                       rel_model=PlatedbExposure,
-                                       to_field='pk',
-                                       related_name='mangadb_exposure')
+                                       model=PlatedbExposure,
+                                       field='pk',
+                                       backref='mangadb_exposure')
     seeing = FloatField(null=True)
-    set = ForeignKeyField(db_column='set_pk',
+    set = ForeignKeyField(column_name='set_pk',
                           null=True,
-                          rel_model=Set,
-                          to_field='pk',
-                          related_name='exposures')
+                          model=Set,
+                          field='pk',
+                          backref='exposures')
     transparency = FloatField(null=True)
 
     class Meta:
@@ -147,14 +147,14 @@ class Exposure(BaseModel):
 
 
 class ExposureToDataCube(BaseModel):
-    data_cube = ForeignKeyField(db_column='data_cube_pk',
+    data_cube = ForeignKeyField(column_name='data_cube_pk',
                                 null=True,
-                                rel_model=DataCube,
-                                to_field='pk')
-    exposure = ForeignKeyField(db_column='exposure_pk',
+                                model=DataCube,
+                                field='pk')
+    exposure = ForeignKeyField(column_name='exposure_pk',
                                null=True,
-                               rel_model=Exposure,
-                               to_field='pk')
+                               model=Exposure,
+                               field='pk')
     pk = PrimaryKeyField()
 
     class Meta:
@@ -175,11 +175,11 @@ class Filelist(BaseModel):
 class Sn2Values(BaseModel):
     b1_sn2 = FloatField(null=True)
     b2_sn2 = FloatField(null=True)
-    exposure = ForeignKeyField(db_column='exposure_pk',
+    exposure = ForeignKeyField(column_name='exposure_pk',
                                null=True,
-                               rel_model=Exposure,
-                               related_name='sn2_values',
-                               to_field='pk')
+                               model=Exposure,
+                               backref='sn2_values',
+                               field='pk')
     pipeline_info_pk = IntegerField(null=True)
     pk = PrimaryKeyField()
     r1_sn2 = FloatField(null=True)
@@ -191,16 +191,16 @@ class Sn2Values(BaseModel):
 
 
 class Spectrum(BaseModel):
-    data_cube = ForeignKeyField(db_column='data_cube_pk',
+    data_cube = ForeignKeyField(column_name='data_cube_pk',
                                 null=True,
-                                rel_model=DataCube,
-                                related_name='spectrums',
-                                to_field='pk')
-    exposure = ForeignKeyField(db_column='exposure_pk',
+                                model=DataCube,
+                                backref='spectrums',
+                                field='pk')
+    exposure = ForeignKeyField(column_name='exposure_pk',
                                null=True,
-                               rel_model=Exposure,
-                               related_name='spectrums',
-                               to_field='pk')
+                               model=Exposure,
+                               backref='spectrums',
+                               field='pk')
     fiber = IntegerField(null=True)
     ifu_no = IntegerField(null=True)
     pk = PrimaryKeyField()
