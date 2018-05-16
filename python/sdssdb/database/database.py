@@ -91,7 +91,7 @@ class SDSSDatabase(PostgresqlDatabase):
     def check_connection(self):
         """Checks whether the connection is open or can be connected."""
 
-        if self.connected and self.get_conn().closed == 0:
+        if self.connected and self.connection().closed == 0:
             return True
 
         try:
@@ -135,7 +135,7 @@ class ObservatoryDatabase(SDSSDatabase):
         """Returns the DSN parameters of the connection."""
 
         try:
-            params = self.get_conn().get_dsn_parameters()
+            params = self.connection().get_dsn_parameters()
             return params
         except AttributeError:
             return None
