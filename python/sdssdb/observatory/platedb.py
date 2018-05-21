@@ -14,7 +14,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from peewee import TextField, DecimalField, IntegerField, BooleanField
+from peewee import TextField, IntegerField, BooleanField, FloatField
 from peewee import BigIntegerField, ForeignKeyField, DateTimeField, DateField
 from peewee import CompositeKey, CharField, PrimaryKeyField, ManyToManyField, DeferredThroughModel
 
@@ -32,7 +32,7 @@ class UnknownField(object):
 
 class Cartridge(BaseModel):
     broken_fibers = TextField(null=True)
-    guide_fiber_throughput = DecimalField(null=True)
+    guide_fiber_throughput = FloatField(null=True)
     number = IntegerField(null=True, unique=True)
     online = BooleanField()
     pk = PrimaryKeyField()
@@ -159,7 +159,7 @@ class Plate(BaseModel):
                              model=Design,
                              backref='plates',
                              field='pk')
-    epoch = DecimalField(null=True)
+    epoch = FloatField(null=True)
     location_id = BigIntegerField(column_name='location_id', null=True)
     name = TextField(null=True)
     pk = BigIntegerField(primary_key=True)
@@ -178,7 +178,7 @@ class Plate(BaseModel):
                                 model=PlateRun,
                                 field='pk')
     rerun = TextField(null=True)
-    temperature = DecimalField(null=True)
+    temperature = FloatField(null=True)
     tile_id = IntegerField(column_name='tile_id', null=True)
     tile = ForeignKeyField(column_name='tile_pk',
                            null=True,
@@ -293,8 +293,8 @@ class BossSn2Threshold(BaseModel):
                              backref='boss_sn2_thresholds', field='pk')
     min_exposures = IntegerField(null=True)
     pk = PrimaryKeyField()
-    sn2_min = DecimalField(null=True)
-    sn2_threshold = DecimalField()
+    sn2_min = FloatField(null=True)
+    sn2_threshold = FloatField()
     version = IntegerField(null=True)
 
     class Meta:
@@ -321,8 +321,8 @@ class ExposureStatus(BaseModel):
 
 
 class Pointing(BaseModel):
-    center_dec = DecimalField(null=True)
-    center_ra = DecimalField(null=True)
+    center_dec = FloatField(null=True)
+    center_ra = FloatField(null=True)
     design = ForeignKeyField(column_name='design_pk', model=Design,
                              backref='pointings', field='pk')
     pk = BigIntegerField(primary_key=True)
@@ -334,9 +334,9 @@ class Pointing(BaseModel):
 
 
 class PlatePointing(BaseModel):
-    ha_observable_max = DecimalField(null=True)
-    ha_observable_min = DecimalField(null=True)
-    hour_angle = DecimalField(null=True)
+    ha_observable_max = FloatField(null=True)
+    ha_observable_min = FloatField(null=True)
+    hour_angle = FloatField(null=True)
     pk = PrimaryKeyField()
     plate = ForeignKeyField(column_name='plate_pk', null=True, model=Plate,
                             backref='plate_pointings', field='pk')
@@ -365,7 +365,7 @@ class ObservationStatus(BaseModel):
 
 class Observation(BaseModel):
     comment = TextField(null=True)
-    mjd = DecimalField(null=True)
+    mjd = FloatField(null=True)
     observation_status = ForeignKeyField(column_name='observation_status_pk',
                                          model=ObservationStatus,
                                          backref='observations',
@@ -394,11 +394,11 @@ class Exposure(BaseModel):
     exposure_status = ForeignKeyField(column_name='exposure_status_pk',
                                       model=ExposureStatus,
                                       field='pk')
-    exposure_time = DecimalField(null=True)
+    exposure_time = FloatField(null=True)
     observation = ForeignKeyField(column_name='observation_pk', null=True, model=Observation,
                                   backref='exposures', field='pk')
     pk = PrimaryKeyField()
-    start_time = DecimalField(null=True)
+    start_time = FloatField(null=True)
     survey_mode = ForeignKeyField(column_name='survey_mode_pk',
                                   null=True, model=SurveyMode, field='pk')
     survey = ForeignKeyField(column_name='survey_pk', null=True,
@@ -419,7 +419,7 @@ class CameraFrame(BaseModel):
     exposure = ForeignKeyField(column_name='exposure_pk', model=Exposure,
                                backref='camera_frames', field='pk')
     pk = PrimaryKeyField()
-    sn2 = DecimalField(null=True)
+    sn2 = FloatField(null=True)
 
     class Meta:
         db_table = 'camera_frame'
@@ -444,12 +444,12 @@ class CameraFrame(BaseModel):
 class CmmMeas(BaseModel):
     cmmfilename = TextField(null=True)
     date = DateField(null=True)
-    fitoffsetx = DecimalField(null=True)
-    fitoffsety = DecimalField(null=True)
-    fitqpang = DecimalField(null=True)
-    fitqpmag = DecimalField(null=True)
-    fitrot = DecimalField(null=True)
-    fitscale = DecimalField(null=True)
+    fitoffsetx = FloatField(null=True)
+    fitoffsety = FloatField(null=True)
+    fitqpang = FloatField(null=True)
+    fitqpmag = FloatField(null=True)
+    fitrot = FloatField(null=True)
+    fitscale = FloatField(null=True)
     pk = PrimaryKeyField()
     plate = ForeignKeyField(column_name='plate_pk', null=True, model=Plate,
                             backref='cmm_measurements', field='pk')
@@ -586,11 +586,11 @@ class PlateHole(BaseModel):
                                        field='pk',
                                        backref='plate_holes')
     pointing_number = IntegerField(null=True)
-    tmass_h = DecimalField(null=True)
-    tmass_j = DecimalField(null=True)
-    tmass_k = DecimalField(null=True)
-    xfocal = DecimalField(null=True)
-    yfocal = DecimalField(null=True)
+    tmass_h = FloatField(null=True)
+    tmass_j = FloatField(null=True)
+    tmass_k = FloatField(null=True)
+    xfocal = FloatField(null=True)
+    yfocal = FloatField(null=True)
 
     class Meta:
         db_table = 'plate_hole'
@@ -615,15 +615,15 @@ class Gprobe(BaseModel):
                                 backref='gprobes', field='pk')
     exists = IntegerField(null=True)
     fiber_type = UnknownField()  # USER-DEFINED
-    focus_offset = DecimalField(null=True)
+    focus_offset = FloatField(null=True)
     gprobe = IntegerField(column_name='gprobe_id', null=True)
     pk = PrimaryKeyField()
-    radius = DecimalField(null=True)
-    rotation = DecimalField(null=True)
-    x_center = DecimalField(null=True)
-    x_ferrule_offset = DecimalField(null=True)
-    y_center = DecimalField(null=True)
-    y_ferrule_offset = DecimalField(null=True)
+    radius = FloatField(null=True)
+    rotation = FloatField(null=True)
+    x_center = FloatField(null=True)
+    x_ferrule_offset = FloatField(null=True)
+    y_center = FloatField(null=True)
+    y_ferrule_offset = FloatField(null=True)
 
     class Meta:
         db_table = 'gprobe'
@@ -633,21 +633,21 @@ class Gprobe(BaseModel):
 class HoleMeas(BaseModel):
     cmm_meas = ForeignKeyField(column_name='cmm_meas_pk', null=True,
                                model=CmmMeas, field='pk')
-    diaerr = DecimalField(null=True)
-    measx = DecimalField(null=True)
-    measy = DecimalField(null=True)
-    nomdia = DecimalField(null=True)
-    nomx = DecimalField(null=True)
-    nomy = DecimalField(null=True)
+    diaerr = FloatField(null=True)
+    measx = FloatField(null=True)
+    measy = FloatField(null=True)
+    nomdia = FloatField(null=True)
+    nomx = FloatField(null=True)
+    nomy = FloatField(null=True)
     pk = PrimaryKeyField()
     plate_hole = ForeignKeyField(column_name='plate_hole_pk', null=True, model=PlateHole,
                                  backref='hole_measurements', field='pk')
-    qpresidr = DecimalField(null=True)
-    qpresidx = DecimalField(null=True)
-    qpresidy = DecimalField(null=True)
-    residr = DecimalField(null=True)
-    residx = DecimalField(null=True)
-    residy = DecimalField(null=True)
+    qpresidr = FloatField(null=True)
+    qpresidx = FloatField(null=True)
+    qpresidy = FloatField(null=True)
+    residr = FloatField(null=True)
+    residx = FloatField(null=True)
+    residy = FloatField(null=True)
 
     class Meta:
         db_table = 'hole_meas'
@@ -803,16 +803,16 @@ class PointingStatus(BaseModel):
 
 class ProfTolerances(BaseModel):
     pk = PrimaryKeyField()
-    r1_high = DecimalField()
-    r1_low = DecimalField()
-    r2_high = DecimalField()
-    r2_low = DecimalField()
-    r3_high = DecimalField()
-    r3_low = DecimalField()
-    r4_high = DecimalField()
-    r4_low = DecimalField()
-    r5_high = DecimalField()
-    r5_low = DecimalField()
+    r1_high = FloatField()
+    r1_low = FloatField()
+    r2_high = FloatField()
+    r2_low = FloatField()
+    r3_high = FloatField()
+    r3_low = FloatField()
+    r4_high = FloatField()
+    r4_low = FloatField()
+    r5_high = FloatField()
+    r5_low = FloatField()
     survey = ForeignKeyField(column_name='survey_pk', model=Survey,
                              backref='prof_tolerances', field='pk')
     version = IntegerField()
@@ -841,11 +841,11 @@ class ProfMeasurement(BaseModel):
     pk = PrimaryKeyField()
     profilometry = ForeignKeyField(column_name='profilometry_pk',
                                    model=Profilometry, field='pk')
-    r1 = DecimalField(null=True)
-    r2 = DecimalField(null=True)
-    r3 = DecimalField(null=True)
-    r4 = DecimalField(null=True)
-    r5 = DecimalField(null=True)
+    r1 = FloatField(null=True)
+    r2 = FloatField(null=True)
+    r3 = FloatField(null=True)
+    r4 = FloatField(null=True)
+    r5 = FloatField(null=True)
     timestamp = DateTimeField(null=True)
 
     class Meta:
