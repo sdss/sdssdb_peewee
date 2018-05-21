@@ -44,7 +44,7 @@ class Cartridge(BaseModel):
 
 class Design(BaseModel):
     comment = TextField(null=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
 
     class Meta:
         db_table = 'design'
@@ -81,7 +81,7 @@ class PlateLocation(BaseModel):
 
 class PlateRun(BaseModel):
     label = TextField(null=True, unique=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     year = IntegerField(null=True)
 
     class Meta:
@@ -99,7 +99,6 @@ class TileStatus(BaseModel):
 
 
 class Tile(BaseModel):
-    id = IntegerField(null=True, unique=True)
     pk = PrimaryKeyField()
     tile_status = ForeignKeyField(column_name='tile_status_pk',
                                   model=TileStatus,
@@ -162,7 +161,7 @@ class Plate(BaseModel):
     epoch = FloatField(null=True)
     location_id = BigIntegerField(column_name='location_id', null=True)
     name = TextField(null=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     plate_completion_status_pk = ForeignKeyField(
         column_name='plate_completion_status_pk',
         null=True,
@@ -325,7 +324,7 @@ class Pointing(BaseModel):
     center_ra = FloatField(null=True)
     design = ForeignKeyField(column_name='design_pk', model=Design,
                              backref='pointings', field='pk')
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     pointing_no = IntegerField(null=True)
 
     class Meta:
@@ -470,7 +469,7 @@ class Constants(BaseModel):
 
 class DesignField(BaseModel):
     label = TextField(unique=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
 
     class Meta:
         db_table = 'design_field'
@@ -482,7 +481,7 @@ class DesignValue(BaseModel):
                             null=True, model=DesignField, field='pk')
     design = ForeignKeyField(column_name='design_pk', null=True,
                              model=Design, backref='values', field='pk')
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     value = TextField(null=True)
 
     class Meta:
@@ -679,7 +678,7 @@ class PlateInput(BaseModel):
     filepath = TextField(null=True)
     input_number = IntegerField(null=True)
     md5_checksum = TextField(null=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     priority = IntegerField(null=True)
 
     class Meta:
@@ -707,7 +706,7 @@ class PlateInput(BaseModel):
 
 class PlateRunToDesign(BaseModel):
     design_pk = BigIntegerField(null=True)
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     plate_run_pk = BigIntegerField(null=True)
 
     class Meta:
@@ -734,7 +733,7 @@ class PlateRunToDesign(BaseModel):
 
 
 class PlateToPlateStatus(BaseModel):
-    pk = BigIntegerField(primary_key=True)
+    pk = PrimaryKeyField()
     plate = ForeignKeyField(column_name='plate_pk', null=True,
                             model=Plate,
                             field='pk')
