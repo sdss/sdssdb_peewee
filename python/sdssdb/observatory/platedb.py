@@ -100,6 +100,7 @@ class TileStatus(BaseModel):
 
 class Tile(BaseModel):
     pk = PrimaryKeyField()
+    id = IntegerField()
     tile_status = ForeignKeyField(column_name='tile_status_pk',
                                   model=TileStatus,
                                   backref='tiles',
