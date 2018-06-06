@@ -10,13 +10,11 @@
 # manual modifications.
 
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 
-from peewee import TextField, IntegerField, BooleanField, FloatField
-from peewee import BigIntegerField, ForeignKeyField, DateTimeField, DateField
-from peewee import CompositeKey, CharField, PrimaryKeyField, ManyToManyField, DeferredThroughModel
+from peewee import (BigIntegerField, BooleanField, CharField, CompositeKey, DateField,
+                    DateTimeField, DeferredThroughModel, FloatField, ForeignKeyField,
+                    IntegerField, ManyToManyField, PrimaryKeyField, TextField)
 
 from sdssdb.observatory import BaseModel, database
 

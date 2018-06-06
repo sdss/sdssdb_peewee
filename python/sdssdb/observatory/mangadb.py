@@ -10,17 +10,15 @@
 # manual modifications.
 
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 
-from peewee import PrimaryKeyField, TextField, IntegerField, BooleanField
-from peewee import ForeignKeyField, FloatField
+from peewee import (BooleanField, FloatField, ForeignKeyField, IntegerField,
+                    PrimaryKeyField, TextField)
 
 from sdssdb.observatory import BaseModel, database
 
-from .platedb import Plate as PlatedbPlate
 from .platedb import Exposure as PlatedbExposure
+from .platedb import Plate as PlatedbPlate
 
 
 database = database  # To avoid annoying PEP8 warning
