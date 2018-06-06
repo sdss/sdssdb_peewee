@@ -16,7 +16,7 @@ class BaseModel(Model):
     class Meta:
         database = database
 
-    def __repr__(self):
+    def __str__(self):
         """A custom repr for observatory models.
 
         By default it always prints pk, name, and label, if found. Models can
@@ -25,25 +25,19 @@ class BaseModel(Model):
 
         """
 
-        reg = re.match('.*\'.*\.(.*)\'.', str(self.__class__))
+        fields = ['pk={0!r}'.format(self.get_id())]
 
-        if reg is not None:
+        for extra_field in ['label']:
+            if extra_field not in self.print_fields:
+                self.print_fields.append(extra_field)
 
-            fields = ['pk={0!r}'.format(self.get_id())]
+        for ff in self.print_fields:
+            if hasattr(self, ff):
+                fields.append('{0}={1!r}'.format(ff, getattr(self, ff)))
 
-            for extra_field in ['label']:
-                if extra_field not in self.print_fields:
-                    self.print_fields.append(extra_field)
-
-            for ff in self.print_fields:
-                if hasattr(self, ff):
-                    fields.append('{0}={1!r}'.format(ff, getattr(self, ff)))
-
-            return '<{0}: {1}>'.format(reg.group(1), ', '.join(fields))
-
-        return super(BaseModel, self).__repr__()
+        return '{0}'.format(', '.join(fields))
 
 
-from . import mangadb, platedb
+from . import mangadb, platedb  # noqa
 
 database.models.update({'mangadb': mangadb, 'platedb': platedb})
