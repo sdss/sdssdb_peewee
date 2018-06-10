@@ -51,9 +51,10 @@ class Plate(BaseModel):
     neverobserve = BooleanField()
     pk = PrimaryKeyField()
     platedb_plate = ForeignKeyField(column_name='platedb_plate_pk',
-                                    null=True,
+                                    null=False,
                                     model=PlatedbPlate,
-                                    field='pk')
+                                    field='pk',
+                                    unique=True)
     special_plate = BooleanField(null=True)
 
     class Meta:

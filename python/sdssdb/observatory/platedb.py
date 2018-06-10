@@ -18,6 +18,8 @@ from peewee import (BigIntegerField, BooleanField, CharField, CompositeKey, Date
 
 from sdssdb.observatory import BaseModel, database
 
+from . import mangadb
+
 
 database = database  # To avoid annoying PEP8 warning
 
@@ -189,6 +191,13 @@ class Plate(BaseModel):
     statuses = ManyToManyField(model=PlateStatus,
                                through_model=PlateStatusThroughModel,
                                backref='plates')
+
+    @property
+    def mangadb_plate(self):
+        """One-to-one backref for mangadb.plate.platedb_plate."""
+
+        return mangadb.Plate.get_or_none(platedb_plate_pk=self.pk)
+
 
     class Meta:
         db_table = 'plate'
